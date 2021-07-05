@@ -11,6 +11,13 @@ public class User {
     private boolean isMale;
     private String image;
 
+    public User(int id, String name, String age, boolean isMale) {
+        this.id = id;
+        this.name = name;
+        this.age = age;
+        this.isMale = isMale;
+    }
+
     public int getId() {
         return id;
     }

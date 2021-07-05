@@ -5,10 +5,12 @@
     android:id="@+id/clytParent"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginHorizontal="10dp"
+    android:layout_marginVertical="10dp"
     android:background="@drawable/shape_item_user"
     android:paddingHorizontal="5dp"
     android:paddingVertical="22dp"
-    android:translationZ="10dp">
+    android:translationZ="0dp">
 
     <TextView
         android:id="@+id/txtID"
