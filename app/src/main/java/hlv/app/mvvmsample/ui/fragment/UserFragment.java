@@ -11,7 +11,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import hlv.app.mvvmsample.adapter.UserAdapter;
+import hlv.app.mvvmsample.ui.adapter.UserAdapter;
 import hlv.app.mvvmsample.databinding.FragmentUserBinding;
 import hlv.app.mvvmsample.viewmodel.UserViewModel;
 

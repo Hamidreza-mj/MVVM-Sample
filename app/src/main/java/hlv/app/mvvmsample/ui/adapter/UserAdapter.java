@@ -1,4 +1,4 @@
-package hlv.app.mvvmsample.adapter;
+package hlv.app.mvvmsample.ui.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
