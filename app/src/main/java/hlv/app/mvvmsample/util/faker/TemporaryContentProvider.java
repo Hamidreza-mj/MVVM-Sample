@@ -22,7 +22,7 @@ public class TemporaryContentProvider {
     }
 
     private static User createPlaceholderItem(int position) {
-        return new User(position, "Username " + position, String.valueOf(position + 100), position % 3 == 0);
+        return new User(position, "Username " + position, position, position % 3 == 0);
     }
 
     private static String makeDetails(int position) {

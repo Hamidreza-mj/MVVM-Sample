@@ -21,7 +21,7 @@
         android:textAllCaps="false"
         android:textSize="15sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toStartOf="@id/aImgAvatar"
+        app:layout_constraintEnd_toStartOf="@id/card"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="HardcodedText" />
@@ -37,7 +37,7 @@
 
         android:textSize="15sp"
         android:textStyle="normal"
-        app:layout_constraintEnd_toStartOf="@id/aImgAvatar"
+        app:layout_constraintEnd_toStartOf="@id/card"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/txtID"
         tools:ignore="HardcodedText" />
@@ -52,7 +52,7 @@
         android:textAllCaps="false"
         android:textSize="15sp"
         android:textStyle="normal"
-        app:layout_constraintEnd_toStartOf="@id/aImgAvatar"
+        app:layout_constraintEnd_toStartOf="@id/card"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/txtName"
         tools:ignore="HardcodedText" />
@@ -68,20 +68,30 @@
         android:textColor="@color/teal_700"
         android:textSize="15sp"
         android:textStyle="normal"
-        app:layout_constraintEnd_toStartOf="@id/aImgAvatar"
+        app:layout_constraintEnd_toStartOf="@id/card"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/txtAge"
         tools:ignore="HardcodedText" />
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/aImgAvatar"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_margin="@dimen/margin_from_parent"
-        android:src="@mipmap/ic_launcher"
+        android:layout_marginEnd="16dp"
+        android:layout_marginVertical="8dp"
+        app:cardCornerRadius="30dp"
+        app:cardBackgroundColor="#00000000"
+        app:cardElevation="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="H,1:1"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/aImgAvatar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
