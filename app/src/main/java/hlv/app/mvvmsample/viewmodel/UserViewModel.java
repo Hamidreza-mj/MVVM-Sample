@@ -1,5 +1,7 @@
 package hlv.app.mvvmsample.viewmodel;
 
+import android.view.View;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -31,6 +33,10 @@ public class UserViewModel extends ViewModel {
 
     public LiveData<ResponseEvent<ArrayList<User>>> getUsersLiveData() {
         return usersLiveData;
+    }
+
+    public int footerVisibility() {
+        return (usersLiveData.getValue().isLastPage()) ? View.VISIBLE : View.GONE;
     }
 
     /**

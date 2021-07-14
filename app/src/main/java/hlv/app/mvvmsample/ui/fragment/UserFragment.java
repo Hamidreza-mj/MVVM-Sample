@@ -18,8 +18,8 @@ import java.util.ArrayList;
 
 import hlv.app.mvvmsample.databinding.FragmentUserBinding;
 import hlv.app.mvvmsample.model.User;
-import hlv.app.mvvmsample.repo.remote.event.Status;
 import hlv.app.mvvmsample.repo.remote.event.ResponseEvent;
+import hlv.app.mvvmsample.repo.remote.event.Status;
 import hlv.app.mvvmsample.ui.adapter.UserAdapter;
 import hlv.app.mvvmsample.ui.component.PagingListener;
 import hlv.app.mvvmsample.viewmodel.UserViewModel;
@@ -89,12 +89,7 @@ public class UserFragment extends Fragment {
             @SuppressLint("SetTextI18n")
             @Override
             public boolean isLastPage() {
-                boolean isLastPage = responseEvent.isLastPage();
-
-                if (isLastPage)
-                    lytFooter.setVisibility(View.VISIBLE);
-
-                return isLastPage;
+                return responseEvent.isLastPage();
             }
 
             @Override
@@ -118,6 +113,9 @@ public class UserFragment extends Fragment {
         viewModel = new ViewModelProvider(this).get(UserViewModel.class);
         viewModel.fetchData();
 
+        //without livedata
+        //lytFooter.setVisibility(viewModel.footerVisibility());
+
         viewModel.getUsersLiveData().observe(getViewLifecycleOwner(), response -> {
             responseEvent = response;
             txtStatus.setText(response.getStatus().toString());
@@ -131,6 +129,9 @@ public class UserFragment extends Fragment {
                     adapter.submitList(response.getResult(), true);
                     isLoading = response.getStatus() == Status.LOADING;
                     totalPages = response.getTotalPages();
+
+                    //with livedata
+                    lytFooter.setVisibility(viewModel.footerVisibility());
                     break;
 
                 case FAILURE:
@@ -149,8 +150,9 @@ public class UserFragment extends Fragment {
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onDestroyView() {
+        super.onDestroyView();
         viewModel.getUsersLiveData().removeObservers(getViewLifecycleOwner());
     }
+
 }
