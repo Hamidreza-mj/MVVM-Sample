@@ -1,7 +1,5 @@
 package hlv.app.mvvmsample.repo.remote.event;
 
-import hlv.app.mvvmsample.repo.remote.Status;
-
 public class ResponseEvent<T> {
 
     private Status status;

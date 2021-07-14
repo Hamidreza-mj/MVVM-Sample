@@ -1,4 +1,4 @@
-package hlv.app.mvvmsample.repo.remote;
+package hlv.app.mvvmsample.repo.remote.api;
 
 import android.util.Log;
 
@@ -12,9 +12,11 @@ import com.google.gson.JsonObject;
 import java.util.ArrayList;
 
 import hlv.app.mvvmsample.model.User;
+import hlv.app.mvvmsample.repo.remote.RetrofitClient;
 import hlv.app.mvvmsample.repo.remote.event.ResponseEvent;
 import hlv.app.mvvmsample.repo.remote.services.GetUsersService;
 import hlv.app.mvvmsample.util.Constants;
+import hlv.app.mvvmsample.util.networking.NetworkingHelper;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;

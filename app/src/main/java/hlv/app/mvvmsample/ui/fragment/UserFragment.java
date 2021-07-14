@@ -16,7 +16,7 @@ import java.util.ArrayList;
 
 import hlv.app.mvvmsample.databinding.FragmentUserBinding;
 import hlv.app.mvvmsample.model.User;
-import hlv.app.mvvmsample.repo.remote.Status;
+import hlv.app.mvvmsample.repo.remote.event.Status;
 import hlv.app.mvvmsample.repo.remote.event.ResponseEvent;
 import hlv.app.mvvmsample.ui.adapter.UserAdapter;
 import hlv.app.mvvmsample.ui.component.PagingListener;

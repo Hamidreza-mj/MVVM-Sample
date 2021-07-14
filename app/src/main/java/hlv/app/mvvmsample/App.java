@@ -4,7 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
 
-import hlv.app.mvvmsample.repo.remote.ApiRepository;
+import hlv.app.mvvmsample.repo.remote.api.ApiRepository;
 
 public class App extends Application {
 

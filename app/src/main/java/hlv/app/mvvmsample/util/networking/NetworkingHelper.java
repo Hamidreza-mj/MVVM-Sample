@@ -1,4 +1,4 @@
-package hlv.app.mvvmsample.repo.remote;
+package hlv.app.mvvmsample.util.networking;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
