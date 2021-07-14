@@ -1,5 +1,6 @@
 package hlv.app.mvvmsample.ui.fragment;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -31,6 +33,7 @@ public class UserFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private TextView txtStatus;
+    private ConstraintLayout lytFooter;
 
     private boolean isLoading = false;
     private int totalPages = 10;
@@ -62,6 +65,7 @@ public class UserFragment extends Fragment {
     private void initViews(FragmentUserBinding binding) {
         recyclerView = binding.recyclerView;
         txtStatus = binding.txtStatus;
+        lytFooter = binding.clytFooter;
     }
 
     private void handleRecyclerView() {
@@ -82,9 +86,15 @@ public class UserFragment extends Fragment {
                 return isLoading;
             }
 
+            @SuppressLint("SetTextI18n")
             @Override
             public boolean isLastPage() {
-                return responseEvent.isLastPage();
+                boolean isLastPage = responseEvent.isLastPage();
+
+                if (isLastPage)
+                    lytFooter.setVisibility(View.VISIBLE);
+
+                return isLastPage;
             }
 
             @Override
@@ -139,8 +149,8 @@ public class UserFragment extends Fragment {
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+    public void onDestroy() {
+        super.onDestroy();
         viewModel.getUsersLiveData().removeObservers(getViewLifecycleOwner());
     }
 }
