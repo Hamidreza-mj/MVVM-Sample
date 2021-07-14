@@ -10,8 +10,8 @@ public class App extends Application {
 
     @SuppressLint("StaticFieldLeak")
     private static App app;
-    public Context context;
-    public ApiRepository apiRepository;
+    public Context applicationContext;
+    private ApiRepository apiRepository;
 
     public static App get() {
         return app;
@@ -20,9 +20,14 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        context = getApplicationContext();
+        applicationContext = getApplicationContext();
         app = this;
 
-        apiRepository = new ApiRepository();
+        if (apiRepository == null)
+            apiRepository = new ApiRepository();
+    }
+
+    public ApiRepository apiRepository() {
+        return apiRepository;
     }
 }

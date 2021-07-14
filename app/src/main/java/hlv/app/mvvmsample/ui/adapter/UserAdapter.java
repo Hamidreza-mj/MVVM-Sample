@@ -6,27 +6,42 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
-import androidx.recyclerview.widget.ListAdapter;
+import androidx.recyclerview.widget.AsyncListDiffer;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
+import java.util.LinkedList;
 
 import hlv.app.mvvmsample.databinding.ItemUserBinding;
 import hlv.app.mvvmsample.model.User;
 
-public class UserAdapter extends ListAdapter<User, UserAdapter.ViewHolder> {
+public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
 
     private final Context context;
+    public AsyncListDiffer<User> differ;
 
     public UserAdapter(Context context) {
-        super(User.DiffUtil);
         this.context = context;
+
+        DiffUtil.ItemCallback<User> diffUtil = new DiffUtil.ItemCallback<User>() {
+            @Override
+            public boolean areItemsTheSame(@NonNull User oldItem, @NonNull User newItem) {
+                return oldItem.getName().equals(newItem.getName());
+            }
+
+            @Override
+            public boolean areContentsTheSame(@NonNull User oldItem, @NonNull User newItem) {
+                return oldItem.equals(newItem);
+            }
+        };
+
+        differ = new AsyncListDiffer<>(this, diffUtil);
     }
 
     @NonNull
@@ -38,23 +53,28 @@ public class UserAdapter extends ListAdapter<User, UserAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull UserAdapter.ViewHolder holder, int position) {
-        holder.bind(getCurrentList().get(position));
+        if (differ.getCurrentList().get(position) != null)
+            holder.bind(differ.getCurrentList().get(position));
     }
 
     @Override
     public int getItemCount() {
-        return getCurrentList().size();
+        return differ.getCurrentList().size();
     }
 
     public void submitList(ArrayList<User> list, boolean withPagination) {
-        if (withPagination && getCurrentList() != null) {
-            ArrayList<User> oldList = new ArrayList<>(getCurrentList());
+        if (withPagination && differ.getCurrentList() != null && list != null) {
+            LinkedList<User> oldList = new LinkedList<>(differ.getCurrentList());
+
+            if (oldList.equals(list))
+                return;
+
             oldList.addAll(list);
-            submitList(oldList);
+            differ.submitList(oldList);
             return;
         }
 
-        submitList(list);
+        differ.submitList(list);
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {

@@ -4,29 +4,36 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.List;
+import java.util.ArrayList;
 
-import hlv.app.mvvmsample.App;
-import hlv.app.mvvmsample.repo.remote.ResponseEvent;
-import hlv.app.mvvmsample.ui.adapter.UserAdapter;
 import hlv.app.mvvmsample.databinding.FragmentUserBinding;
+import hlv.app.mvvmsample.model.User;
+import hlv.app.mvvmsample.repo.remote.Status;
+import hlv.app.mvvmsample.repo.remote.event.ResponseEvent;
+import hlv.app.mvvmsample.ui.adapter.UserAdapter;
+import hlv.app.mvvmsample.ui.component.PagingListener;
 import hlv.app.mvvmsample.viewmodel.UserViewModel;
 
 public class UserFragment extends Fragment {
 
-    private RecyclerView recyclerView;
-    private UserAdapter adapter;
-    private boolean isLoading = false;
-
     private UserViewModel viewModel;
+    private ResponseEvent<ArrayList<User>> responseEvent;
+
+    private UserAdapter adapter;
+
+    private RecyclerView recyclerView;
+    private TextView txtStatus;
+
+    private boolean isLoading = false;
+    private int totalPages = 10;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -54,73 +61,76 @@ public class UserFragment extends Fragment {
 
     private void initViews(FragmentUserBinding binding) {
         recyclerView = binding.recyclerView;
+        txtStatus = binding.txtStatus;
     }
 
     private void handleRecyclerView() {
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-        adapter = new UserAdapter(getContext());
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(adapter);
+        getActivity().runOnUiThread(() -> {
+            adapter = new UserAdapter(getContext());
+            recyclerView.setLayoutManager(layoutManager);
+            recyclerView.setAdapter(adapter);
 
+        });
         handlePaging(layoutManager);
     }
 
     private void handlePaging(LinearLayoutManager layoutManager) {
-        RecyclerView.OnScrollListener recyclerViewOnScrollListener = new RecyclerView.OnScrollListener() {
+        recyclerView.addOnScrollListener(new PagingListener(layoutManager) {
             @Override
-            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
+            public boolean isLoading() {
+                return isLoading;
             }
 
             @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                int visibleItemCount = layoutManager.getChildCount();
-                int totalItemCount = layoutManager.getItemCount();
-                int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
-
-                if (!isLoading/* && !isLastPage*/) {
-                    if ((5 + lastVisibleItemPosition) >= totalItemCount
-                            && lastVisibleItemPosition >= 0
-                            && totalItemCount >= 1) { //prePage
-                        loadNextPageItems();
-                    }
-                }
+            public boolean isLastPage() {
+                return responseEvent.isLastPage();
             }
-        };
 
-        /*
-         super.onScrolled(recyclerView, dx, dy);
-                int visibleItemCount = layoutManager.getChildCount();
-                int totalItemCount = layoutManager.getItemCount();
-                int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
-
-                if (!isLoading && !isLastPage) {
-            if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount
-                    && firstVisibleItemPosition >= 0
-                    && totalItemCount >= 1) { //prePage
-                loadNextPageItems();
+            @Override
+            public int getTotalPage() {
+                return totalPages;
             }
-        }
 
-         */
-
-        recyclerView.addOnScrollListener(recyclerViewOnScrollListener);
+            @Override
+            public void loadNextPageItems() {
+                loadNextPage();
+            }
+        });
     }
 
-    private void loadNextPageItems() {
-        viewModel.prepareData(viewModel.getPageLiveData().getValue() + 1);
-
-//        if (viewModel.getPageLiveData().getValue() / 10 == 0)
-//            isLoading = true; ////// TODO: 7/11/21 remove !!
+    private void loadNextPage() {
+        viewModel.fetchData(responseEvent.getCurrentPage() + 1);
     }
+
 
     private void handleObserver() {
         viewModel = new ViewModelProvider(this).get(UserViewModel.class);
-        viewModel.prepareData();
+        viewModel.fetchData();
 
-        App.get().apiRepository.userMutableLiveData.observe(getViewLifecycleOwner(), list -> {
-            adapter.submitList(list, true);
+        viewModel.getUsersLiveData().observe(getViewLifecycleOwner(), response -> {
+            responseEvent = response;
+            txtStatus.setText(response.getStatus().toString());
+
+            switch (response.getStatus()) {
+                case LOADING:
+
+                    break;
+
+                case SUCCESS:
+                    adapter.submitList(response.getResult(), true);
+                    isLoading = response.getStatus() == Status.LOADING;
+                    totalPages = response.getTotalPages();
+                    break;
+
+                case FAILURE:
+
+                    break;
+
+                case NETWORK_ERROR:
+
+                    break;
+            }
         });
     }
 
@@ -131,6 +141,6 @@ public class UserFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-
+        viewModel.getUsersLiveData().removeObservers(getViewLifecycleOwner());
     }
 }

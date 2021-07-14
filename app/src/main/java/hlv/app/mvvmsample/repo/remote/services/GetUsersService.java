@@ -1,12 +1,12 @@
-package hlv.app.mvvmsample.repo.remote.interfaces;
+package hlv.app.mvvmsample.repo.remote.services;
 
 import com.google.gson.JsonElement;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import hlv.app.mvvmsample.model.User;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.Field;
@@ -19,9 +19,8 @@ import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 import retrofit2.http.QueryMap;
-import retrofit2.http.Url;
 
-public interface GetUsers {
+public interface GetUsersService {
 
     /**
      * https://randomuser.me/api/1/12
@@ -44,7 +43,7 @@ public interface GetUsers {
      * @return list of users
      */
     @GET("api")
-    Call<JsonElement> getUsers(@Query("page") int page, @Query("results") int perPage);
+    Call<JsonElement> getUsers(@Query("page") int page, @Query("results") int perPage, @Query("nat") String national);
 
     @GET("api")
     Call<List<User>> getUsers(@QueryMap Map<String, String> queryMap);

@@ -1,51 +1,44 @@
 package hlv.app.mvvmsample.viewmodel;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import hlv.app.mvvmsample.App;
 import hlv.app.mvvmsample.model.User;
-import hlv.app.mvvmsample.util.faker.TemporaryContentProvider;
+import hlv.app.mvvmsample.repo.remote.event.ResponseEvent;
 
 public class UserViewModel extends ViewModel {
 
-    private MutableLiveData<ArrayList<User>> usersLiveData;
-    private final MutableLiveData<Integer> pageLiveData; // TODO: 7/11/21 probably need to int page and not need to live data
+    private final MutableLiveData<ResponseEvent<ArrayList<User>>> usersLiveData;
 
     public UserViewModel() {
-        usersLiveData = new MutableLiveData<>();
-        pageLiveData = new MutableLiveData<>();
+        usersLiveData = App.get().apiRepository().getUserEventLive();
     }
 
-    public void prepareData(int page) {
-        pageLiveData.setValue(page);
-        App.get().apiRepository.users(page);
-//        usersLiveData.setValue(App.get().apiRepository.userMutableLiveData.getValue());
+    public void fetchData(int page) {
+        App.get().apiRepository().users(page);
     }
 
     /**
      * when initiate class must be call this
      */
-    public void prepareData() {
-        prepareData(1);
+    public void fetchData() {
+        fetchData(1);
+    }
+
+    public LiveData<ResponseEvent<ArrayList<User>>> getUsersLiveData() {
+        return usersLiveData;
     }
 
     /**
      * for loading offline temporary data call this
      */
     public void tempData() {
-        usersLiveData.setValue(TemporaryContentProvider.ITEMS);
-    }
-
-    public MutableLiveData<ArrayList<User>> getUsersLiveData() {
-        return usersLiveData;
-    }
-
-    public MutableLiveData<Integer> getPageLiveData() {
-        return pageLiveData;
+        //    private MutableLiveData<ArrayList<User>> usersLiveData;
+        //usersLiveData.setValue(TemporaryContentProvider.ITEMS);
     }
 
     @Override

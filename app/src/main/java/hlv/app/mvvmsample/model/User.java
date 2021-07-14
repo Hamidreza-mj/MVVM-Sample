@@ -75,25 +75,12 @@ public class User {
         if (this == o) return true;
         if (!(o instanceof User)) return false;
         User user = (User) o;
-        return getId() == user.getId();
+        return getName().equals(user.getName());
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(getId());
     }
-
-    @NonNull
-    public static DiffUtil.ItemCallback<User> DiffUtil = new DiffUtil.ItemCallback<User>() {
-        @Override
-        public boolean areItemsTheSame(@NonNull User oldItem, @NonNull User newItem) {
-            return oldItem.id == newItem.id;
-        }
-
-        @Override
-        public boolean areContentsTheSame(@NonNull User oldItem, @NonNull User newItem) {
-            return oldItem.equals(newItem);
-        }
-    };
 
 }

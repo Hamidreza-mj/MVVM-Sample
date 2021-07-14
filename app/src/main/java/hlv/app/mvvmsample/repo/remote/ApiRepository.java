@@ -4,8 +4,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelStore;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -14,26 +12,36 @@ import com.google.gson.JsonObject;
 import java.util.ArrayList;
 
 import hlv.app.mvvmsample.model.User;
-import hlv.app.mvvmsample.repo.remote.interfaces.GetUsers;
-import hlv.app.mvvmsample.viewmodel.UserViewModel;
+import hlv.app.mvvmsample.repo.remote.event.ResponseEvent;
+import hlv.app.mvvmsample.repo.remote.services.GetUsersService;
+import hlv.app.mvvmsample.util.Constants;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class ApiRepository {
 
-    public MutableLiveData<ArrayList<User>> userMutableLiveData = new MutableLiveData<>();
+    private final MutableLiveData<ResponseEvent<ArrayList<User>>> userEventLive = new MutableLiveData<>();
 
     public void users(int page) {
-        GetUsers getUsers = RetrofitClient.get().create(GetUsers.class);
-        Call<JsonElement> call = getUsers.getUsers(page, 1);
+        ResponseEvent<ArrayList<User>> event = new ResponseEvent<>();
+        event.setPageMeta(page, Constants.Networking.PER_PAGE, Constants.Networking.TOTAL_PAGE);
+        userEventLive.setValue(event.loadingResponse());
+
+        if (!NetworkingHelper.getNetworking().isOnline()) {
+            userEventLive.setValue(event.networkErrorResponse());
+            return;
+        }
+
+        GetUsersService getUsersService = RetrofitClient.get().create(GetUsersService.class);
+        Call<JsonElement> call = getUsersService.getUsers(page, Constants.Networking.PER_PAGE, "us");
 
         call.enqueue(new Callback<JsonElement>() {
             @Override
             public void onResponse(@NonNull Call<JsonElement> call, @NonNull Response<JsonElement> response) {
                 try {
                     if (!response.isSuccessful() || response.body() == null) {
-                        userMutableLiveData.setValue(null);
+                        userEventLive.setValue(event.failureResponse("Response is empty!"));
                         return;
                     }
 
@@ -63,25 +71,29 @@ public class ApiRepository {
                         userList.add(user2);
                     }
 
-                    userMutableLiveData.setValue(userList);
+                    userEventLive.setValue(event.successResponse(userList));
 
                 } catch (Exception e) {
                     e.printStackTrace();
-                    userMutableLiveData.setValue(null);
+                    userEventLive.setValue(event.failureResponse(e.getMessage()));
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<JsonElement> call, @NonNull Throwable t) {
                 Log.e("Error Retrofit", t.getMessage());
-                userMutableLiveData.setValue(null);
+                userEventLive.setValue(event.failureResponse(t.getMessage()));
             }
         });
     }
 
-/*
+    public MutableLiveData<ResponseEvent<ArrayList<User>>> getUserEventLive() {
+        return userEventLive;
+    }
+
+    /*
     public void users2(int page) {
-        GetUsers getUsers = RetrofitClient.get().create(GetUsers.class);
+        GetUsersService getUsers = RetrofitClient.get().create(GetUsersService.class);
         Call<ResponseBody> call = getUsers.getUsers(page, 10);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
