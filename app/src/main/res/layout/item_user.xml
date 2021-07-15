@@ -34,7 +34,6 @@
         android:layout_marginTop="@dimen/margin_from_parent"
         android:text="name"
         android:textAllCaps="false"
-
         android:textSize="15sp"
         android:textStyle="normal"
         app:layout_constraintEnd_toStartOf="@id/card"

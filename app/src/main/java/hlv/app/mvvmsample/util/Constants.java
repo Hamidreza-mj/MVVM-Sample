@@ -9,8 +9,8 @@ public class Constants {
     }
 
     public static class Networking {
-        public static final int PER_PAGE = 20;
-        public static final int TOTAL_PAGE = 5;
+        public static final int PER_PAGE = 10;
+        public static final int TOTAL_PAGE = 2;
     }
 
     public static class Urls {

@@ -15,6 +15,9 @@ public class User {
     private boolean isMale;
     private String image;
 
+    public User() {
+    }
+
     public User(int id, String name, String image, int age, boolean isMale) {
         this.id = id;
         this.name = name;
@@ -75,7 +78,7 @@ public class User {
         if (this == o) return true;
         if (!(o instanceof User)) return false;
         User user = (User) o;
-        return getName().equals(user.getName());
+        return Objects.equals(getName(), user.getName());
     }
 
     @Override

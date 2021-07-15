@@ -14,7 +14,9 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.List;
 
 import hlv.app.mvvmsample.databinding.FragmentUserBinding;
 import hlv.app.mvvmsample.model.User;
@@ -108,7 +110,6 @@ public class UserFragment extends Fragment {
         viewModel.fetchData(responseEvent.getCurrentPage() + 1);
     }
 
-
     private void handleObserver() {
         viewModel = new ViewModelProvider(this).get(UserViewModel.class);
         viewModel.fetchData();
@@ -122,7 +123,9 @@ public class UserFragment extends Fragment {
 
             switch (response.getStatus()) {
                 case LOADING:
+                    if (response.getCurrentPage() == 1) {
 
+                    }
                     break;
 
                 case SUCCESS:
@@ -132,10 +135,16 @@ public class UserFragment extends Fragment {
 
                     //with livedata
                     lytFooter.setVisibility(viewModel.footerVisibility());
+
+                    if (response.isLastPage())
+                        adapter.removeLoading();
+
                     break;
 
                 case FAILURE:
+                    if (response.getMessage() != null && !response.getMessage().isEmpty()) {
 
+                    }
                     break;
 
                 case NETWORK_ERROR:
