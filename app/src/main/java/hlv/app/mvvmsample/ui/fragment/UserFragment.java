@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -33,7 +32,6 @@ public class UserFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private TextView txtStatus;
-    private ConstraintLayout lytFooter;
 
     private boolean isLoading = false;
     private int totalPages = 10;
@@ -65,7 +63,6 @@ public class UserFragment extends Fragment {
     private void initViews(FragmentUserBinding binding) {
         recyclerView = binding.recyclerView;
         txtStatus = binding.txtStatus;
-        lytFooter = binding.clytFooter;
     }
 
     private void handleRecyclerView() {
@@ -132,10 +129,10 @@ public class UserFragment extends Fragment {
                     totalPages = response.getTotalPages();
 
                     //with livedata
-                    lytFooter.setVisibility(viewModel.footerVisibility());
+                    //lytFooter.setVisibility(viewModel.footerVisibility());
 
                     if (response.isLastPage())
-                        adapter.removeLoading();
+                        adapter.removeLoadingLastPage();
 
                     break;
 

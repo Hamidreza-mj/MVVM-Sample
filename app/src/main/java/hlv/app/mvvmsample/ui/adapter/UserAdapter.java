@@ -1,6 +1,7 @@
 package hlv.app.mvvmsample.ui.adapter;
 
 import android.content.Context;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -133,16 +134,22 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         differ.submitList(list);
     }
 
-    public void removeLoading() {
-        isLoaderVisible = false;
-        ArrayList<User> users = new ArrayList<>(differ.getCurrentList());
-        int position = users.size() - 1;
-        User item = users.get(position);
+    /**
+     * remove loading if is in last page (current_page == total_page)
+     * must be call with some delay
+     */
+    public void removeLoadingLastPage() {
+        new Handler().postDelayed(() -> {
+            isLoaderVisible = false;
+            ArrayList<User> users = new ArrayList<>(differ.getCurrentList());
+            int position = users.size() - 1;
+            User item = users.get(position);
 
-        if (item != null && Objects.equals(item.getUniqueID(), Constants.App.LOADING_UNIQUE_ID)) {
-            users.remove(users.get(position));
-            differ.submitList(users);
-        }
+            if (item != null && Objects.equals(item.getUniqueID(), Constants.App.LOADING_UNIQUE_ID)) {
+                users.remove(item);
+                differ.submitList(users);
+            }
+        }, 100);
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
