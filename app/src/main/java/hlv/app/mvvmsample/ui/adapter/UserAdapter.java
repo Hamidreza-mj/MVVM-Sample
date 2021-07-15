@@ -15,13 +15,12 @@ import com.squareup.picasso.Picasso;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Objects;
 
 import hlv.app.mvvmsample.databinding.ItemLoadingBinding;
 import hlv.app.mvvmsample.databinding.ItemUserBinding;
 import hlv.app.mvvmsample.model.User;
+import hlv.app.mvvmsample.util.Constants;
 
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
 
@@ -38,7 +37,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         DiffUtil.ItemCallback<User> diffUtil = new DiffUtil.ItemCallback<User>() {
             @Override
             public boolean areItemsTheSame(@NonNull User oldItem, @NonNull User newItem) {
-                return Objects.equals(oldItem.getName(), newItem.getName());
+                return Objects.equals(oldItem.getUniqueID(), newItem.getUniqueID());
             }
 
             @Override
@@ -109,7 +108,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
                 int position = oldList.size() - 1;
                 User item = oldList.get(position);
 
-                if (item != null && Objects.equals(item.getName(), "Loading-Item")) {
+                if (item != null && Objects.equals(item.getUniqueID(), Constants.App.LOADING_UNIQUE_ID)) {
                     oldList.remove(oldList.get(position));
                 }
             }
@@ -122,7 +121,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
                 isLoaderVisible = true;
 
                 User loadingItem = new User();
-                loadingItem.setName("Loading-Item"); //need for DiffUtil unique property
+                loadingItem.setUniqueID(Constants.App.LOADING_UNIQUE_ID); //need for DiffUtil unique property
                 oldList.add(loadingItem);
             }
 
@@ -140,9 +139,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         int position = users.size() - 1;
         User item = users.get(position);
 
-        if (item != null && Objects.equals(item.getName(), "Loading-Item")) {
+        if (item != null && Objects.equals(item.getUniqueID(), Constants.App.LOADING_UNIQUE_ID)) {
             users.remove(users.get(position));
-            users.clear();
             differ.submitList(users);
         }
     }
@@ -167,7 +165,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         }
 
         private void bind(User user) {
-            if (txtID != null && user.getImage() != null) {
+            if (txtID != null && user.getName() != null) {
                 txtID.setText(getFormat("ID", user.getId()));
                 txtName.setText(getFormat("Name", user.getName()));
                 txtAge.setText(getFormat("Age", user.getAge()));

@@ -60,6 +60,11 @@ public class ApiRepository {
                         String first = nameObject.get("first").getAsString();
                         String last = nameObject.get("last").getAsString();
 
+                        JsonObject loginObject = object.getAsJsonObject("login");
+                        String uuid = loginObject.get("uuid").getAsString();
+                        String username = loginObject.get("username").getAsString();
+                        String sha1 = loginObject.get("sha1").getAsString();
+
                         String name = title + ". " + first + " " + last;
 
                         String image = object.getAsJsonObject("picture").get("large").getAsString();
@@ -68,7 +73,9 @@ public class ApiRepository {
 
                         boolean isMale = object.get("gender").getAsString().equalsIgnoreCase("male");
 
-                        User user2 = new User(i, name, image, age, isMale);
+                        String uniqueID = uuid + username + sha1;
+
+                        User user2 = new User(i, name, image, age, isMale, uniqueID);
 
                         userList.add(user2);
                     }

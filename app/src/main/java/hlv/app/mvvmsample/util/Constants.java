@@ -6,6 +6,7 @@ public class Constants {
     }
 
     public static class App {
+        public static final String LOADING_UNIQUE_ID = "Loading-Item";
     }
 
     public static class Networking {
