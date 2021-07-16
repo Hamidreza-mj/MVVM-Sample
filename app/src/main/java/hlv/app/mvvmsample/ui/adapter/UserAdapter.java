@@ -18,6 +18,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import hlv.app.mvvmsample.databinding.ItemFooterBinding;
 import hlv.app.mvvmsample.databinding.ItemLoadingBinding;
 import hlv.app.mvvmsample.databinding.ItemUserBinding;
 import hlv.app.mvvmsample.model.User;
@@ -30,7 +31,9 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
 
     private static final int LOADING_VIEW_TYPE = 0;
     private static final int NORMAL_VIEW_TYPE = 1;
+    private static final int FOOTER_VIEW_TYPE = 2;
     private boolean isLoaderVisible = false;
+    private boolean addFooterInLastPage = false;
 
     public UserAdapter(Context context) {
         this.context = context;
@@ -65,6 +68,11 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
                 ItemUserBinding bindingNormal = ItemUserBinding.inflate(LayoutInflater.from(context), parent, false);
                 viewHolder = new ViewHolder(bindingNormal);
                 break;
+
+            case FOOTER_VIEW_TYPE:
+                ItemFooterBinding bindingFooter = ItemFooterBinding.inflate(LayoutInflater.from(context), parent, false);
+                viewHolder = new ViewHolder(bindingFooter);
+                break;
         }
 
         return viewHolder;
@@ -80,10 +88,9 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
     @Override
     public int getItemViewType(int position) {
         if (isLoaderVisible) {
-            if (position == differ.getCurrentList().size() - 1)
-                return LOADING_VIEW_TYPE;
-            else
-                return NORMAL_VIEW_TYPE;
+            return (position == differ.getCurrentList().size() - 1) ? LOADING_VIEW_TYPE : NORMAL_VIEW_TYPE;
+        } else if (addFooterInLastPage && position == differ.getCurrentList().size() - 1) {
+            return FOOTER_VIEW_TYPE;
         } else {
             return NORMAL_VIEW_TYPE;
         }
@@ -139,8 +146,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
      * must be call with some delay
      */
     public void removeLoadingLastPage() {
+        isLoaderVisible = false;
         new Handler().postDelayed(() -> {
-            isLoaderVisible = false;
             ArrayList<User> users = new ArrayList<>(differ.getCurrentList());
             int position = users.size() - 1;
             User item = users.get(position);
@@ -150,6 +157,21 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
                 differ.submitList(users);
             }
         }, 100);
+    }
+
+    /**
+     * add footer in the end of items of last page (isLastPage && position == list.size -1)
+     * this must be call with more delay than {@link #removeLoadingLastPage()}
+     */
+    public void addFooterInLastPage() {
+        addFooterInLastPage = true;
+        new Handler().postDelayed(() -> {
+            ArrayList<User> currentList = new ArrayList<>(differ.getCurrentList());
+            User footerItem = new User();
+            footerItem.setUniqueID(Constants.App.FOOTER_UNIQUE_ID);
+            currentList.add(footerItem);
+            differ.submitList(currentList);
+        }, 200);
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
@@ -168,6 +190,10 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         }
 
         public ViewHolder(@NonNull ItemLoadingBinding binding) {
+            super(binding.getRoot());
+        }
+
+        public ViewHolder(@NonNull ItemFooterBinding binding) {
             super(binding.getRoot());
         }
 

@@ -131,8 +131,10 @@ public class UserFragment extends Fragment {
                     //with livedata
                     //lytFooter.setVisibility(viewModel.footerVisibility());
 
-                    if (response.isLastPage())
+                    if (response.isLastPage()) {
                         adapter.removeLoadingLastPage();
+                        adapter.addFooterInLastPage();
+                    }
 
                     break;
 
