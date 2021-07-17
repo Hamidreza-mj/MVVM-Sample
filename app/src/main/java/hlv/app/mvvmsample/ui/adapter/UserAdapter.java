@@ -3,23 +3,28 @@ package hlv.app.mvvmsample.ui.adapter;
 import android.content.Context;
 import android.os.Handler;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatImageView;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.AsyncListDiffer;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
+import com.wang.avi.AVLoadingIndicatorView;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import hlv.app.mvvmsample.R;
 import hlv.app.mvvmsample.databinding.ItemFooterBinding;
 import hlv.app.mvvmsample.databinding.ItemLoadingBinding;
+import hlv.app.mvvmsample.databinding.ItemRetryBinding;
 import hlv.app.mvvmsample.databinding.ItemUserBinding;
 import hlv.app.mvvmsample.model.User;
 import hlv.app.mvvmsample.util.Constants;
@@ -32,8 +37,11 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
     private static final int LOADING_VIEW_TYPE = 0;
     private static final int NORMAL_VIEW_TYPE = 1;
     private static final int FOOTER_VIEW_TYPE = 2;
+    private static final int RETRY_VIEW_TYPE = 3;
     private boolean isLoaderVisible = false;
     private boolean addFooterInLastPage = false;
+    private boolean retryButtonShown = false;
+    private boolean networkError = true;
 
     public UserAdapter(Context context) {
         this.context = context;
@@ -73,6 +81,10 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
                 ItemFooterBinding bindingFooter = ItemFooterBinding.inflate(LayoutInflater.from(context), parent, false);
                 viewHolder = new ViewHolder(bindingFooter);
                 break;
+
+            case RETRY_VIEW_TYPE:
+                ItemRetryBinding bindingRetry = ItemRetryBinding.inflate(LayoutInflater.from(context), parent, false);
+                viewHolder = new ViewHolder(bindingRetry);
         }
 
         return viewHolder;
@@ -91,6 +103,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
             return (position == differ.getCurrentList().size() - 1) ? LOADING_VIEW_TYPE : NORMAL_VIEW_TYPE;
         } else if (addFooterInLastPage && position == differ.getCurrentList().size() - 1) {
             return FOOTER_VIEW_TYPE;
+        } else if (retryButtonShown && position == differ.getCurrentList().size() - 1) {
+            return RETRY_VIEW_TYPE;
         } else {
             return NORMAL_VIEW_TYPE;
         }
@@ -174,10 +188,22 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
         }, 200);
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    public void addRetryButton() {
+        retryButtonShown = true;
+        new Handler().postDelayed(() -> {
+            ArrayList<User> currentList = new ArrayList<>(differ.getCurrentList());
+            User retryItem = new User();
+            retryItem.setUniqueID(Constants.App.RETRY_UNIQUE_ID);
+            currentList.add(retryItem);
+            differ.submitList(currentList);
+        }, 300);
+    }
+
+    class ViewHolder extends RecyclerView.ViewHolder {
 
         private TextView txtID, txtName, txtAge, txtGender;
         private AppCompatImageView imgAvatar;
+        private AVLoadingIndicatorView aviLoader;
 
         public ViewHolder(@NonNull ItemUserBinding binding) {
             super(binding.getRoot());
@@ -191,10 +217,16 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
 
         public ViewHolder(@NonNull ItemLoadingBinding binding) {
             super(binding.getRoot());
+
+            aviLoader = binding.avi;
         }
 
         public ViewHolder(@NonNull ItemFooterBinding binding) {
             super(binding.getRoot());
+        }
+
+        public ViewHolder(ItemRetryBinding bindingRetry) {
+            super(bindingRetry.getRoot());
         }
 
         private void bind(User user) {
@@ -205,6 +237,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
                 txtGender.setText(getFormat("Gender", user.isMale() ? "Man" : "Woman"));
 
                 Picasso.get().load(user.getImage()).into(imgAvatar);
+            } else if (aviLoader != null && networkError && Objects.equals(user.getUniqueID(), Constants.App.LOADING_UNIQUE_ID)) {
+                aviLoader.setVisibility(View.GONE);
             }
         }
 

@@ -8,6 +8,7 @@ public class Constants {
     public static class App {
         public static final String LOADING_UNIQUE_ID = "Loading-Item";
         public static final String FOOTER_UNIQUE_ID = "Footer-Item";
+        public static final String RETRY_UNIQUE_ID = "Retry-Item";
     }
 
     public static class Networking {

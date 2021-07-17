@@ -2,6 +2,7 @@ package hlv.app.mvvmsample.ui.fragment;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -71,8 +72,8 @@ public class UserFragment extends Fragment {
             adapter = new UserAdapter(getContext());
             recyclerView.setLayoutManager(layoutManager);
             recyclerView.setAdapter(adapter);
-
         });
+
         handlePaging(layoutManager);
     }
 
@@ -114,6 +115,7 @@ public class UserFragment extends Fragment {
 
         viewModel.getUsersLiveData().observe(getViewLifecycleOwner(), response -> {
             responseEvent = response;
+            isLoading = response.getStatus() == Status.LOADING;
             txtStatus.setText(response.getStatus().toString());
 
             switch (response.getStatus()) {
@@ -125,7 +127,6 @@ public class UserFragment extends Fragment {
 
                 case SUCCESS:
                     adapter.submitList(response.getResult(), true);
-                    isLoading = response.getStatus() == Status.LOADING;
                     totalPages = response.getTotalPages();
 
                     //with livedata
@@ -145,7 +146,11 @@ public class UserFragment extends Fragment {
                     break;
 
                 case NETWORK_ERROR:
-
+                    if (response.getCurrentPage() >= 1 && adapter.differ.getCurrentList().size() != 0) {
+                        //paginate error
+                        adapter.removeLoadingLastPage();
+                        new Handler().postDelayed(() -> adapter.addRetryButton(), 400);
+                    }
                     break;
             }
         });
